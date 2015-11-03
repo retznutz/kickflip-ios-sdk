@@ -47,7 +47,7 @@
 }
 
 - (void) setupHLSWriterWithEndpoint:(KFS3Stream*)endpoint {
-    
+    self.S3Endpoint = endpoint;
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
     NSString *folderName = [NSString stringWithFormat:@"%@.hls", endpoint.streamID];
@@ -212,23 +212,25 @@
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     [self.locationManager startUpdatingLocation];
-    [[KFAPIClient sharedClient] startNewStream:^(KFStream *endpointResponse, NSError *error) {
-        if (error) {
-            if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidStartRecording:error:)]) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self.delegate recorderDidStartRecording:self error:error];
-                });
-            }
-            return;
-        }
-        self.stream = endpointResponse;
-        [self setStreamStartLocation];
-        if ([endpointResponse isKindOfClass:[KFS3Stream class]]) {
-            KFS3Stream *s3Endpoint = (KFS3Stream*)endpointResponse;
-            s3Endpoint.streamState = KFStreamStateStreaming;
-            [self setupHLSWriterWithEndpoint:s3Endpoint];
-            
-            [[KFHLSMonitor sharedMonitor] startMonitoringFolderPath:_hlsWriter.directoryPath endpoint:s3Endpoint delegate:self];
+    //[[KFAPIClient sharedClient] startNewStream:^(KFStream *endpointResponse, NSError *error) {
+//        if (error) {
+//            if (self.delegate && [self.delegate respondsToSelector:@selector(recorderDidStartRecording:error:)]) {
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    [self.delegate recorderDidStartRecording:self error:error];
+//                });
+//            }
+//            return;
+//        }
+    
+    
+        //self.stream = endpointResponse;
+        //[self setStreamStartLocation];
+//        if ([endpointResponse isKindOfClass:[KFS3Stream class]]) {
+//            KFS3Stream *s3Endpoint = (KFS3Stream*)endpointResponse;
+//            s3Endpoint.streamState = KFStreamStateStreaming;
+//            [self setupHLSWriterWithEndpoint:s3Endpoint];
+    
+            [[KFHLSMonitor sharedMonitor] startMonitoringFolderPath:_hlsWriter.directoryPath endpoint:self.S3Endpoint delegate:self];
             
             NSError *error = nil;
             [_hlsWriter prepareForWriting:&error];
@@ -241,8 +243,8 @@
                     [self.delegate recorderDidStartRecording:self error:nil];
                 });
             }
-        }
-    }];
+        //}
+  //  }];
     
 }
 

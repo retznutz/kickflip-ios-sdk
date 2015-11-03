@@ -25,7 +25,7 @@
  *  KFRecorder manages the majority of the AV pipeline
  */
 @interface KFRecorder : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate, KFEncoderDelegate, KFHLSUploaderDelegate, CLLocationManagerDelegate>
-
+@property (nonatomic, strong) KFS3Stream *S3Endpoint;
 @property (nonatomic, strong) AVCaptureSession* session;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer* previewLayer;
 @property (nonatomic, strong) AVCaptureVideoDataOutput* videoOutput;
@@ -51,5 +51,7 @@
 
 - (void) startRecording;
 - (void) stopRecording;
+
+- (void) setupHLSWriterWithEndpoint:(KFS3Stream*)endpoint;
 
 @end
